@@ -25,20 +25,26 @@ getRandom = do generator <- get
                put newGenerator
                return value
 
+-- | General version of 'randomR' for all Enum.
+enumRandomR :: (Enum a, Random a, RandomGen g) => (a, a) -> g -> (a, g)
+enumRandomR (a, b) g = case randomR (fromEnum a, fromEnum b) g of
+                         (r, g') -> (toEnum r, g')
+
+-- | General version of 'random' for all Enum.
+enumRandom :: (RandomGen a, Enum b) => a -> (b, a)
+enumRandom = over _1 toEnum . random
+-- fwiw I think these may exist somewhere already.
+
 data Orientation = Horizontal
                   | Vertical deriving (Eq, Show, Enum, Bounded)
 
 instance Random ShipType where
-         random g  = case randomR (fromEnum (minBound :: ShipType), fromEnum (maxBound :: ShipType)) g of
-                       (r, g') -> (toEnum r, g')
-         randomR (a, b) g = case randomR (fromEnum a, fromEnum b) g of
-                              (r, g') -> (toEnum r, g')
+         random = enumRandom
+         randomR = enumRandomR
 
 instance Random Orientation where
-         random g  = case randomR (fromEnum (minBound :: Orientation), fromEnum (maxBound :: Orientation)) g of
-                       (r, g') -> (toEnum r, g')
-         randomR (a, b) g = case randomR (fromEnum a, fromEnum b) g of
-                              (r, g') -> (toEnum r, g')
+         random  = enumRandom
+         randomR = enumRandomR
 
 data ShipType = Carrier
                | Battleship
