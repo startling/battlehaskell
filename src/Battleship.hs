@@ -17,9 +17,9 @@ import Control.Lens
 import Language.Haskell.TH
 import System.Random
 
-type GeneratorState = State StdGen
+type GeneratorState x = State x
 
-getRandom :: Random a => GeneratorState a
+getRandom :: (Random a, RandomGen s) => GeneratorState s a
 getRandom = do generator <- get
                let (value, newGenerator) = random generator
                put newGenerator
@@ -53,9 +53,10 @@ data Ship = Ship { orientation :: Orientation
                   , y :: Int } deriving (Eq, Show)
 
 instance Random Ship where
-         random = runRand $ Ship <$> liftRand random <*> liftRand random <*> pure [] <*> liftRand random <*> liftRand random
-         -- I want the last two arguments to be Ints between a & b (or some specifiable range), but it seems like a & b are some other kind of type?
-         --randomR (a, b) = runRand $ Ship <$> liftRand random <*> liftRand random <*> pure [] <*> liftRand (randomR a b) <*> liftRand (randomR a b)
+         random = runState $ Ship <$> getRandom <*> getRandom
+                                  <*> pure [0]  <*> getRandom
+                                  <*> getRandom
+
 
 data Spot = Maybe Ship deriving (Show)
 
