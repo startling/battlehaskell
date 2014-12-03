@@ -5,12 +5,12 @@ module Battleship where
 
 import Control.Applicative
 import Control.Monad (when)
-import Control.Monad.Random
+import Control.Monad.Random hiding (getRandom)
 import Control.Monad.Trans.State
 import Data.List as L
 import Data.List.Split (splitOn, chunksOf)
 import Data.Ord
-import Data.Text as T
+import qualified Data.Text as T
 import Data.Text.Read as R
 --import Debug.Trace
 import Control.Lens
@@ -188,7 +188,7 @@ playGame board = do
 
 
 
-import Data.Ord 
+
 
 ex13 :: Int -> Int -> Int -> Int
 ex13 x y z = square a + square b
