@@ -70,10 +70,10 @@ getDamage :: Ship -> [Int]
 getDamage = view damage
 
 setDamage :: [Int] -> Ship -> Ship
-setDamage damages ship = ship { _damage = damages }
+setDamage i s = set damage i s
 
 updateDamage :: ([Int] -> [Int]) -> Ship -> Ship
-updateDamage f ship = setDamage (f $ getDamage ship) ship
+updateDamage f ship = over damage f ship
 
 sizeOf :: Ship -> Int
 sizeOf ship = case ty of
