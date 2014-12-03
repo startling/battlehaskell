@@ -73,15 +73,6 @@ data Board = Board { _spots :: [Ship]
 makeLenses ''Board     
 makeLenses ''Ship
 
-getDamage :: Ship -> [Int]
-getDamage = view damage
-
-setDamage :: [Int] -> Ship -> Ship
-setDamage i s = set damage i s
-
-updateDamage :: ([Int] -> [Int]) -> Ship -> Ship
-updateDamage f ship = over damage f ship
-
 sizeOf :: Ship -> Int
 sizeOf ship = case ty of
                 Carrier -> 5
@@ -106,7 +97,7 @@ letterMarker ship ox oy = if isDamaged
                               offset = case orientation ship of
                                          Horizontal -> ox - sx
                                          Vertical -> oy - sy
-                              isDamaged = offset `elem` getDamage ship
+                              isDamaged = offset `elem` view damage ship
 
 shipAt :: Board -> Int -> Int -> [Ship]
 shipAt board x y = [s | s <- getShips board, not $ L.null ([(x, y)] `intersect` shipCoords s)]
@@ -161,7 +152,7 @@ addShip board ship = if canAddShip board ship
                         else board
 
 isShipAlive :: Ship -> Bool
-isShipAlive ship = sizeOf ship > L.length (getDamage ship)
+isShipAlive ship = sizeOf ship > L.length (view damage ship)
 
 isGameOver :: Board -> Bool
 isGameOver board = 0 == L.length unsunkShips
@@ -174,7 +165,7 @@ fireAt :: Board -> Int -> Int -> Board
 fireAt board fx fy = updateShips shipsHelper board
               where shipsHelper = \ships -> case ship of
                                               [] -> ships
-                                              [s] -> (ships \\ [s]) ++ [updateDamage (nub . (\ds -> offset : ds)) s]
+                                              [s] -> (ships \\ [s]) ++ [over damage (nub . (\ds -> offset : ds)) s]
                                                   where offset = case orientation s of
                                                                    Horizontal -> fx - x s
                                                                    Vertical -> fy - y s
